@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pour toi 💖</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&display=swap">
+<style>
+:root{--bg:#ffe3ec;--glow:#fff6f0;--ink:#4a1d35;--soft:#9a5a78;--accent:#e0457b;--card:#ffffff;
+  box-sizing:border-box}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#2a1020;--glow:#4a1c36;--ink:#ffeaf1;--soft:#e0a9c0;--accent:#ff7fab;--card:#3a1829}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 50% 10%,var(--glow),var(--bg) 70%) fixed;color:var(--ink);
+  font-family:"Newsreader",Georgia,"Times New Roman",serif;line-height:1.5;overflow-x:hidden}
+body.locked{overflow:hidden;height:100vh}
+section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 24px;text-align:center}
+h1,h2{font-family:"Great Vibes","Brush Script MT",cursive;font-weight:400;margin:0;color:var(--accent)}
+h1{font-size:clamp(3.2rem,15vw,6rem);line-height:1.1}
+h2{font-size:clamp(2.4rem,9vw,3.6rem);margin-bottom:1.2rem}
+.sub{font-size:1.25rem;font-style:italic;color:var(--soft);margin:.6rem 0 2rem}
+.btn{font:inherit;font-size:1.2rem;color:#fff;background:var(--accent);border:0;border-radius:999px;padding:.9rem 2rem;cursor:pointer;
+  box-shadow:0 8px 24px rgba(224,69,123,.35)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.msg{max-width:34rem;font-size:clamp(1.3rem,4.8vw,1.8rem);margin:0 0 2.4rem;opacity:0;transform:translateY(24px);transition:opacity 1s,transform 1s}
+.msg.show{opacity:1;transform:none}
+.gallery{display:flex;gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;width:100%;padding:24px 8vw 32px}
+.polaroid{flex:0 0 min(78vw,20rem);scroll-snap-align:center;background:var(--card);padding:12px 12px 16px;border-radius:6px;
+  box-shadow:0 12px 30px rgba(74,29,53,.25);transform:rotate(var(--r,0deg))}
+.polaroid:nth-child(odd){--r:-2deg}.polaroid:nth-child(even){--r:2deg}
+.polaroid img,.ph{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:3px}
+.ph{background:linear-gradient(135deg,#ffc2d6,#ffe9c9);display:flex;align-items:center;justify-content:center;font-size:3rem}
+.polaroid p{margin:.8rem 0 0;font-style:italic;color:var(--soft)}
+.days{font-family:"Great Vibes",cursive;font-size:clamp(4rem,20vw,7rem);color:var(--accent);line-height:1}
+.sign{font-family:"Great Vibes",cursive;font-size:2.6rem;color:var(--accent);margin-top:1rem}
+#music{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:14px;z-index:5;width:46px;height:46px;border-radius:50%;
+  border:1.5px solid var(--accent);background:var(--card);font-size:1.3rem;cursor:pointer;display:none}
+#music.on{display:block}
+.heart{position:fixed;bottom:-2rem;pointer-events:none;opacity:.7;animation:rise linear forwards;z-index:1}
+@keyframes rise{to{transform:translateY(-115vh) rotate(25deg);opacity:0}}
+</style>
+</head>
+<body class="locked">
+<button id="music" aria-label="Musique">🎵</button>
+
+<section id="cover">
+  <h1 id="title"></h1>
+  <p class="sub" id="subtitle"></p>
+  <button class="btn" id="open">Ouvrir 💌</button>
+</section>
+
+<section id="messages"></section>
+
+<section id="photos">
+  <h2>Nos souvenirs 📸</h2>
+  <div class="gallery" id="gallery"></div>
+  <p class="sub">← glisse →</p>
+</section>
+
+<section id="counter" hidden>
+  <h2>Ensemble depuis</h2>
+  <div class="days" id="days"></div>
+  <p class="sub">jours… et ce n’est que le début 💞</p>
+</section>
+
+<section id="final">
+  <h2 id="finalTitle"></h2>
+  <div id="finalLines"></div>
+  <div class="sign" id="sign"></div>
+</section>
+
+<audio id="audio" loop preload="auto"></audio>
+
+<script>
+// ================= MODIFIE ICI =================
+const HER_NAME   = "toi mon amour";
+const MY_NAME    = "Mostafa";
+const START_DATE = "2026-09-15";               // ex: "2024-02-14" (année-mois-jour). Laisse vide pour cacher le compteur
+const MUSIC      = "dib.mp3";      // mets ta musique dans le même dossier que index.html
+
+const PHOTOS = [                     // mets tes photos dans le dossier "photos"
+  { src: "photo/meet.jpg", caption: "Ce jour-là, j’ai su 💖" },
+  { src: "photo/souris.jpg", caption: "Ton sourire, ma chose préférée 🌸" },
+  { src: "photo/fleur.jpg", caption: "Kol nhar kan7ebbek ktar mn lbare7 💞" },
+  { src: "photo/miror.jpg", caption: "Mnin kanchoufek, kanssa kolchi 🌹" },
+  { src: "photo/biso.jpg", caption: "Dheka dyalek kat3mer 9albi belfarha ✨" },
+  { src: "photo/1.jpg", caption: "Tu es belle à en perdre mes mots 🌹" },
+  { src: "photo/2.jpg", caption: "أنتِ جميلة بروحكِ قبل وجهكِ 🤍" },
+  { src: "photo/7.jpg", caption: "Même les étoiles te jalousent ⭐" },
+  { src: "photo/3.jpg", caption: "Mnin kanchoufek, kanssa kolchi 🌹" },
+  { src: "photo/4.jpg", caption: "Tu n’as pas besoin de lumière pour briller, tu es la lumière 🌟" },
+  { src: "photo/5.jpg", caption: "حتى القمر يغار من نورِ وجهكِ 🌙" },
+  { src: "photo/4.jpg", caption: "عيناكِ أجمل قصيدة قرأتها 🌹" }
+];
+
+const MESSAGES = [
+  "Tu es la plus belle chose qui me soit arrivée 💗",
+  "Ton sourire éclaire mes journées les plus sombres ✨",
+  "Avec toi, je me sens chez moi 🏡",
+  "Tu es ma paix, mon rire, ma personne préférée 🌹",
+  "Je t’aime, aujourd’hui et chaque jour 💞"
+];
+
+const FINAL_TITLE = "Je t’aime";
+const FINAL_LINES = [
+  "Merci d’être toi, et d’être là 🤍",
+  "Je prendrai soin de ton cœur, toujours."
+];
+// ================================================
+
+const $ = id => document.getElementById(id);
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+$("title").textContent = `Pour ${HER_NAME} 💖`;
+$("subtitle").textContent = "J’ai préparé quelque chose rien que pour toi…";
+$("finalTitle").textContent = FINAL_TITLE;
+$("sign").textContent = `${MY_NAME} 💖`;
+
+// messages
+MESSAGES.forEach(t => { const p = document.createElement("p"); p.className = "msg"; p.textContent = t; $("messages").appendChild(p); });
+FINAL_LINES.forEach(t => { const p = document.createElement("p"); p.className = "msg"; p.textContent = t; $("finalLines").appendChild(p); });
+
+// photos (si la photo n’existe pas encore, un cœur s’affiche à la place)
+PHOTOS.forEach(ph => {
+  const card = document.createElement("div"); card.className = "polaroid";
+  const img = document.createElement("img"); img.src = ph.src; img.alt = ph.caption; img.loading = "lazy";
+  img.onerror = () => { const d = document.createElement("div"); d.className = "ph"; d.textContent = "💗"; img.replaceWith(d); };
+  const cap = document.createElement("p"); cap.textContent = ph.caption;
+  card.append(img, cap); $("gallery").appendChild(card);
+});
+
+// compteur de jours
+if (START_DATE) {
+  const d = Math.floor((Date.now() - new Date(START_DATE + "T00:00:00").getTime()) / 86400000);
+  if (d >= 0) { $("days").textContent = d.toLocaleString("fr-FR"); $("counter").hidden = false; }
+}
+
+// apparition au scroll
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add("show"); }), { threshold: .4 });
+document.querySelectorAll(".msg").forEach(m => io.observe(m));
+
+// musique + ouverture
+const audio = $("audio"); audio.src = MUSIC;
+const mbtn = $("music");
+$("open").addEventListener("click", () => {
+  document.body.classList.remove("locked");
+  audio.play().then(() => { mbtn.textContent = "🎵"; }).catch(() => { mbtn.textContent = "🔇"; });
+  mbtn.classList.add("on");
+  $("messages").scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+});
+mbtn.addEventListener("click", () => {
+  if (audio.paused) { audio.play(); mbtn.textContent = "🎵"; } else { audio.pause(); mbtn.textContent = "🔇"; }
+});
+
+// cœurs qui montent
+if (!reduce) {
+  const icons = ["❤️","💗","💖","🌸","💕","🌷"];
+  setInterval(() => {
+    const h = document.createElement("span"); h.className = "heart";
+    h.textContent = icons[Math.floor(Math.random() * icons.length)];
+    h.style.left = Math.random() * 100 + "vw";
+    h.style.fontSize = (14 + Math.random() * 18) + "px";
+    h.style.animationDuration = (7 + Math.random() * 6) + "s";
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 14000);
+  }, 900);
+}
+</script>
+</body>
+</html>
